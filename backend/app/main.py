@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.config import TEST_PING
 
-app = FastAPI(title="my-web-app API")
+app = FastAPI(title="my-learning-app API")
 
 # Allow frontend dev server
 app.add_middleware(
