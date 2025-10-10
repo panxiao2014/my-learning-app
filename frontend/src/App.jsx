@@ -1,5 +1,6 @@
 import { useState } from "react";
 import MainContent from "./components/MainContent";
+import UserManagement from "./components/UserManagement";
 
 function App() {
   const [activeTab, setActiveTab] = useState("main");
@@ -22,12 +23,26 @@ function App() {
           >
             Main
           </button>
+
+          <button
+            id="users-nav-button"
+            data-testid="users-nav-button"
+            onClick={() => setActiveTab("users")}
+            className={`w-full text-left px-4 py-2 rounded-lg transition-colors duration-200 ${
+              activeTab === "users"
+                ? "bg-blue-500 text-white"
+                : "text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+            }`}
+          >
+            Users
+          </button>
         </nav>
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 p-4">
         {activeTab === "main" && <MainContent />}
+        {activeTab === "users" && <UserManagement />}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from app.config.config import TEST_PING
 from app.users.userdb_utils import init_database_session, seed_database
+from app.users.userdb_requets import router as userdb_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,3 +32,5 @@ app.add_middleware(
 @app.get("/ping")
 async def ping():
     return {"message": TEST_PING}
+
+app.include_router(userdb_router)

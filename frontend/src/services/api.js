@@ -5,3 +5,11 @@ export async function getPingApi() {
     }
     return res.json();
   }
+
+export async function getRandomUserApi() {
+  const res = await fetch("/api/randomUser");
+  if (!res.ok) {
+    throw new Error("Failed to fetch random user");
+  }
+  return res.json();
+}
