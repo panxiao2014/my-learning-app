@@ -15,6 +15,11 @@ from fastapi import FastAPI
 
 
 def get_db_host() -> str:
+    # If running inside Docker, use docker network hostname
+    if os.getenv("RUNNING_IN_DOCKER"):
+        print("🐳 Detected Docker via RUNNING_IN_DOCKER env, using 'postgres'")
+        return "postgres"
+    
     return "localhost"
     
 
@@ -28,6 +33,12 @@ def read_postgres_password() -> str:
     Raises:
         RuntimeError: If password is not found in environment variable or file
     """
+    # try to get from environment variable (for CI/CD in Github Actions)
+    postgres_password = os.getenv("POSTGRES_PASSWORD")
+    if postgres_password:
+        print(f"🐳 Detected POSTGRES_PASSWORD")
+        return postgres_password
+    
     tokens_path = Path(__file__).resolve().parent.parent.parent / "tokens" / "postgresql.txt"
     try:
         return tokens_path.read_text(encoding="utf-8").strip()
@@ -51,7 +62,17 @@ def seed_database():
         inspector = inspect(engine)
         users_table_name = Users.__tablename__
         if not inspector.has_table(users_table_name):
-            sys.exit(1)
+            # Create the table using raw SQL with IF NOT EXISTS and anonymous constraints
+            create_sql = f"""
+            CREATE TABLE IF NOT EXISTS {users_table_name} (
+                id SERIAL PRIMARY KEY,
+                name VARCHAR(40) NOT NULL UNIQUE,
+                gender VARCHAR(6) NOT NULL CHECK (gender IN ('Male','Female')),
+                age INTEGER NOT NULL CHECK (age >= 0 AND age <= 100)
+            )
+            """
+            with engine.begin() as conn:
+                conn.execute(text(create_sql))
         
         # Create session
         db = SessionLocal()

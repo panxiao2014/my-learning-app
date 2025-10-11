@@ -1,0 +1,18 @@
+FROM python:3.11-slim
+WORKDIR /myapp
+
+# 0. Install system dependencies (curl)
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# 1. Install backend deps
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 2. Copy backend source
+COPY backend/ ./backend
+
+# 3. Add backend to Python path and run FastAPI with uvicorn
+ENV PYTHONPATH=/myapp/backend
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
