@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
-from .userdb_ops import choose_ramdon_user, add_user
+from .userdb_ops import choose_ramdon_user, add_user, delete_user
 
 
 router = APIRouter()
@@ -25,3 +25,11 @@ async def ramdon_user(db: Session = Depends(get_db)) -> dict:
     if user is None:
         raise HTTPException(status_code=404, detail="No users found in database")
     return user
+
+
+@router.post("/deleteUser")
+async def delete_user_request(request: Request, db: Session = Depends(get_db)):
+    # get the user from the request:
+    user = await request.json()
+    ret = delete_user(db, user)
+    return ret

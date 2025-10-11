@@ -2,7 +2,7 @@ from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from .models import Users
-from app.config.config import UserAddResultType, USER_ADD_RESULT
+from app.config.config import UserAddResultType, USER_ADD_RESULT, USER_DELETE_RESULT, FakeUser
 
 
 def choose_ramdon_user(db: Session) -> Optional[Dict[str, Any]]:
@@ -57,3 +57,30 @@ def add_user(db: Session, user: Dict[str, Any]) -> UserAddResultType:
         db.rollback()
         return USER_ADD_RESULT["error"]
     return
+
+
+def delete_user(db: Session, user: Dict[str, str]) -> UserAddResultType:
+    """
+    Delete a user from the users table.
+    """
+    user_name = user["name"]
+    #check if user does not exist:
+    if not db.query(Users).filter_by(name=user_name).first():
+        return USER_DELETE_RESULT["not_found"]
+
+    try:
+        db.query(Users).filter_by(name=user_name).delete()
+        db.commit()
+        return USER_DELETE_RESULT["success"]
+    except Exception as e:
+        db.rollback()
+        return USER_DELETE_RESULT["error"]
+    return
+
+
+def delete_fake_user(db: Session) -> UserAddResultType:
+    """
+    Delete the fake test user from the users table.
+    This function is specifically for cleaning up test data.
+    """
+    return delete_user(db, {"name": FakeUser["name"]})
