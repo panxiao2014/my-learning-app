@@ -5,11 +5,10 @@ This module contains shared functions used across user-related database operatio
 
 import os
 import sys
-import json
 from pathlib import Path
 from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import sessionmaker
-from .models import Base, Users
+from .models import Users
 from pathlib import Path
 from fastapi import FastAPI
 
@@ -21,6 +20,14 @@ def get_db_host() -> str:
         return "postgres"
     
     return "localhost"
+
+
+def get_localhost_url() -> str:
+    # If running in Github Actions, use 80:
+    if os.getenv("RUN_IN_GITHUB_ACTIONS"):
+        return "http://localhost:80"
+    else:
+        return "http://localhost:5173"
     
 
 def read_postgres_password() -> str:

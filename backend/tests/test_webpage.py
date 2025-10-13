@@ -2,9 +2,9 @@ import pytest
 from playwright.sync_api import Page, expect
 from sqlalchemy.orm import Session
 
-from app.config.config import TEST_PING, FakeUser, USER_ADD_RESULT, LOCAL_HOST_URL
+from app.config.config import TEST_PING, FakeUser, USER_ADD_RESULT
 from app.users.userdb_ops import delete_fake_user
-from app.users.userdb_utils import init_database_session
+from app.users.userdb_utils import init_database_session, get_localhost_url
 from app.main import app
 
 
@@ -23,10 +23,15 @@ def setup_database():
         db.close()
 
 
+@pytest.fixture(scope="module")
+def localhost_url():
+    return get_localhost_url()
+
+
 @pytest.mark.e2e
-def test_click_button_displays_test_ping(page: Page):
+def test_click_button_displays_test_ping(page: Page, localhost_url: str):
     # Open the frontend app
-    page.goto(LOCAL_HOST_URL)
+    page.goto(localhost_url)
 
     # Navigate to the Main tab (should be default, but ensure we're on the right tab)
     page.get_by_test_id("main-nav-button").click()
@@ -60,9 +65,9 @@ def test_click_button_displays_test_ping(page: Page):
 
 
 @pytest.mark.e2e
-def test_click_show_me_a_user_button_displays_user_info(page: Page):
+def test_click_show_me_a_user_button_displays_user_info(page: Page, localhost_url: str):
     # Open the frontend app
-    page.goto(LOCAL_HOST_URL)
+    page.goto(localhost_url)
 
     # Navigate to the Users tab first
     page.get_by_test_id("users-nav-button").click()
@@ -95,13 +100,13 @@ def test_click_show_me_a_user_button_displays_user_info(page: Page):
 
 
 @pytest.mark.e2e
-def test_click_add_user_button(page: Page, setup_database: Session):
+def test_click_add_user_button(page: Page, setup_database: Session, localhost_url: str):
     """
     Use FakeUser to test the add user button.
     """
 
     # Open the frontend app
-    page.goto(LOCAL_HOST_URL)
+    page.goto(localhost_url)
     
     # Navigate to the Users tab
     page.get_by_test_id("users-nav-button").click()

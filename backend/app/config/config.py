@@ -1,5 +1,4 @@
 TEST_PING = "pong!"
-LOCAL_HOST_URL = "http://localhost:5173"
 
 from pydantic import BaseModel, Field
 from typing import Dict

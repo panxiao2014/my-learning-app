@@ -48,6 +48,7 @@ jobs:
           - name: Run Docker Compose
             env:
               POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+              RUN_IN_GITHUB_ACTIONS: 1
             run: |
                 docker-compose -f docker-compose.yml up -d
                 echo "💡 Docker containers running." 
