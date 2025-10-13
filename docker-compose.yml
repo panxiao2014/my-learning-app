@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}  # taken from host env
+      POSTGRES_DB: userdb
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 15
+    networks:
+      - myapp-network
+
+  backend:
+    restart: "no"
+    image: my-backend:latest
+    container_name: backend.mywebapp.local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      RUNNING_IN_DOCKER: 1
+    ports:
+      - "8000:8000"
+    networks:
+      - myapp-network
+
+  frontend:
+    restart: "no"
+    image: my-frontend:latest
+    container_name: frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "80:80"
+    networks:
+      - myapp-network
+
+networks:
+  myapp-network:
+    driver: bridge
