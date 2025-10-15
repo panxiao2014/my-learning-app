@@ -11,9 +11,15 @@ from sqlalchemy.orm import sessionmaker
 from .models import Users
 from pathlib import Path
 from fastapi import FastAPI
+import json
 
 
 def get_db_host() -> str:
+    #If running in AWS, use RDS_DATABASE_HOST defined in backend task:
+    if os.getenv("RDS_DATABASE_HOST"):
+        print("🐳 Detected AWS, using 'RDS_DATABASE_HOST'")
+        return os.getenv("RDS_DATABASE_HOST")
+    
     # If running inside Docker, use docker network hostname
     if os.getenv("RUNNING_IN_DOCKER"):
         print("🐳 Detected Docker via RUNNING_IN_DOCKER env, using 'postgres'")
@@ -40,12 +46,21 @@ def read_postgres_password() -> str:
     Raises:
         RuntimeError: If password is not found in environment variable or file
     """
+    # Try to get from environment variable (for AWS deployment)
+    # the value is got from the AWS Secrets Manager by secret ARN, which is defined in the AWS Task and have the following format:
+    # {"username":"postgres","password":"<password>","engine":"postgres","host":"userdb.abcdefg.ap-northeast-3.rds.amazonaws.com","port":5432,"dbInstanceIdentifier":"userdb"}
+    postgres_secret = os.getenv("POSTGRES_SECRET")
+    if postgres_secret:
+        print(f"🐳 Detected POSTGRES_SECRET")
+        return json.loads(postgres_secret)["password"]
+    
     # try to get from environment variable (for CI/CD in Github Actions)
     postgres_password = os.getenv("POSTGRES_PASSWORD")
     if postgres_password:
         print(f"🐳 Detected POSTGRES_PASSWORD")
         return postgres_password
     
+    #get password from local file
     tokens_path = Path(__file__).resolve().parent.parent.parent / "tokens" / "postgresql.txt"
     try:
         return tokens_path.read_text(encoding="utf-8").strip()
