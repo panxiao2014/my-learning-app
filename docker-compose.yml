@@ -21,7 +21,7 @@ services:
   backend:
     restart: "no"
     image: my-backend:latest
-    container_name: backend.mywebapp.local
+    container_name: backend.mylearningapp.local
     depends_on:
       postgres:
         condition: service_healthy
