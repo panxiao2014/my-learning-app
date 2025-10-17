@@ -8,7 +8,12 @@ router = APIRouter()
 
 def get_db(request: Request) -> Session:
     """Dependency to get database session"""
-    return request.app.state.db_session_factory()
+    SessionLocal = request.app.state.db_session_factory
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @router.post("/addUser")
