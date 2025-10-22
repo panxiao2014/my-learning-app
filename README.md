@@ -82,3 +82,5 @@ In another console window:
 >cd frontend
 >
 >npm run dev
+
+Then you can access the web application through port 5173.
