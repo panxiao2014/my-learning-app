@@ -20,9 +20,9 @@ I am doing this project in a Windows 11 laptop, with the following software and 
 
 * Python 3.13.7
 * Uvicorn (install by "pip install uvicorn")
-* npm (install Node.js)
-* PostgreSQL server running in local
-* Ubuntu running on WSL
+* npm 10.9.3 (install Node.js)
+* PostgreSQL server 17.6 running in local
+* Ubuntu 22.04.5 running on WSL
 
 Other tools are needed and we can install them whenever they are needed during tutorials.
 
@@ -84,3 +84,25 @@ In another console window:
 >npm run dev
 
 Then you can access the web application through port 5173.
+
+# 🐋 Run in Docker
+
+If you want to run the application in Docker without following the tutorials, here are the steps.
+
+## Build images
+
+Build images for frontend and backend:
+
+>docker build -f Dockerfile-frontend -t my-frontend:latest .
+>
+>docker build -f Dockerfile-backend -t my-backend:latest .
+
+## Set database password
+
+>export POSTGRES_PASSWORD=\<database password\>
+
+## Start application
+
+>docker-compose up
+
+Then you can access the web application through port 80. 
