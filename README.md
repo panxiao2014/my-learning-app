@@ -2,13 +2,13 @@
 
 This is a complete guide of building a web application with CI/CD support. It includes:
 
-* Build a framework of web application with fronentend, backend and database suupport.
+* Build a framework of web application with fronentend, backend and database support.
 * Run application in local and Docker environment.
 * Setup and run test cases for the application.
 * Continuous Integration by Github Actions.
 * Deploy application to AWS.
 
-It is focusing on the process of setup the CI/CD not the fetures the source code provides. Once we have completed the process we can enjoy the efficient developmenting streamline, with any feature we want to add with regression test to make sure its quality and deploy it to AWS with minimum effort.
+It is focusing on the process of setup the CI/CD not the features the source code provides. Once we have completed the process we can enjoy the efficient developmenting streamline, adding any feature we want with regression test and deploy it to AWS with minimum effort.
 
 # 💡 How to use it
 
@@ -24,11 +24,11 @@ I am doing this project in a Windows 11 laptop, with the following software and 
 * PostgreSQL server 17.6 running in local
 * Ubuntu 22.04.5 running on WSL
 
-Other tools are needed and we can install them whenever they are needed during tutorials.
+Other tools are not mentioned here but we can install them whenever they are needed during tutorials.
 
 # ⚒️ Quick setup
 
-If you want to run the application in local without following the tutorials, here are the steps.
+If you want to run the application in local host without following the tutorials, here are the steps.
 
 ## Download source code and install dependencies
 
