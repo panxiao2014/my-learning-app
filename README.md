@@ -1,3 +1,4 @@
+![cover](assets/cover.png)
 # 🚀 Overview
 
 This is a complete guide of building a web application with CI/CD support. It includes:
@@ -7,6 +8,7 @@ This is a complete guide of building a web application with CI/CD support. It in
 * Setup and run test cases for the application.
 * Continuous Integration by Github Actions.
 * Deploy application to AWS.
+* Deploy application to Oracle Cloud.
 
 It is focusing on the process of setup the CI/CD not the features the source code provides. Once we have completed the process we can enjoy the efficient developmenting streamline, adding any feature we want with regression test and deploy it to AWS with minimum effort.
 
