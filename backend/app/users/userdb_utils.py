@@ -20,7 +20,12 @@ def get_db_host() -> str:
         print("🐳 Detected AWS, using 'RDS_DATABASE_HOST'")
         return os.getenv("RDS_DATABASE_HOST")
     
-    # If running inside Docker, use docker network hostname
+    #If running in Oracle Cloud, use OCI_DATABASE_HOSt defined in environment variable:
+    if os.getenv("OCI_DATABASE_HOST"):
+        print("🐳 Detected OCI, using 'OCI_DATABASE_HOST'")
+        return os.getenv("OCI_DATABASE_HOST")
+    
+    # If database server is running inside Docker, use docker network hostname
     if os.getenv("RUNNING_IN_DOCKER"):
         print("🐳 Detected Docker via RUNNING_IN_DOCKER env, using 'postgres'")
         return "postgres"
@@ -66,15 +71,49 @@ def read_postgres_password() -> str:
         return tokens_path.read_text(encoding="utf-8").strip()
     except FileNotFoundError:
         raise RuntimeError(f"PostgreSQL password not found in environment variable POSTGRES_PASSWORD or file at: {tokens_path}")
+    
+
+def read_database_password() -> str:
+    """
+    For OCI, read database password from environment variable.
+
+    Otherwise, read PostgreSQL password from environment variable or file.
+    
+    Returns:
+        str: The database password
+    """
+    if os.getenv("OCI_DATABASE_HOST"):
+        return os.getenv("OCI_DATABASE_PASSWORD")
+    
+    return read_postgres_password()
+
+
+def get_database_url() -> str:
+    """
+    Construct the database URL. For now we will support PostgreSQL and MySQL.
+    
+    Returns:
+        str: The database URL
+    """
+    try:
+        db_host = get_db_host()
+        password = read_database_password()
+
+        if os.getenv("OCI_DATABASE_HOST"):
+            username = os.getenv("OCI_DATABASE_USERNAME")
+            return f"mysql+pymysql://{username}:{password}@{db_host}:3306/userdb"
+        
+        return f"postgresql+psycopg2://postgres:{password}@{db_host}:5432/userdb"
+    
+    except Exception as e:
+        print(f"❌ Error constructing database URL: {e}")
+        sys.exit(1)
+
 
 def seed_database():
     """Seed the database with test users."""
     try:
-        db_host = get_db_host()
-        password = read_postgres_password()
-        # Get database connection
-        
-        database_url = f"postgresql+psycopg2://postgres:{password}@{db_host}:5432/userdb"
+        database_url = get_database_url()
         
         # Create engine and session
         engine = create_engine(database_url, pool_pre_ping=True)
@@ -130,13 +169,13 @@ def seed_database():
                 
         except Exception as e:
             db.rollback()
-            print(f"🛒 Error seeding database: {e}")
+            print(f"❌ Error seeding database: {e}")
             sys.exit(1)
         finally:
             db.close()
             
     except Exception as e:
-        print(f"🛒 Error connecting to database: {e}")
+        print(f"❌ Error connecting to database: {e}")
         sys.exit(1)
 
 def init_database_session(app: FastAPI):
@@ -146,20 +185,16 @@ def init_database_session(app: FastAPI):
     Args:
         app: FastAPI application instance
     """
-    db_host = get_db_host()
 
     try:
-        password = read_postgres_password()
-        database_url = f"postgresql+psycopg2://postgres:{password}@{db_host}:5432/userdb"
+        database_url = get_database_url()
         engine = create_engine(database_url, pool_pre_ping=True)
         # Probe connectivity early to fail fast
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
         SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     except Exception as exc:
-        message = "Failed to initialize database session to host '{host}': {err}".format(
-            host=db_host, err=str(exc)
-        )
+        message = "Failed to initialize database session {err}".format(err=str(exc))
         raise RuntimeError(message) from exc
 
     app.state.db_engine = engine
