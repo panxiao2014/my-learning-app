@@ -26,8 +26,8 @@ def get_db_host() -> str:
         return os.getenv("OCI_DATABASE_HOST")
     
     # If database server is running inside Docker, use docker network hostname
-    if os.getenv("RUNNING_IN_DOCKER"):
-        print("🐳 Detected Docker via RUNNING_IN_DOCKER env, using 'postgres'")
+    if os.getenv("DATABASE_RUNNING_IN_DOCKER"):
+        print("🐳 Detected Docker via DATABASE_RUNNING_IN_DOCKER env, using 'postgres'")
         return "postgres"
     
     return "localhost"

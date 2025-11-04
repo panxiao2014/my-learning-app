@@ -27,7 +27,7 @@ services:
         condition: service_healthy
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      RUNNING_IN_DOCKER: 1
+      DATABASE_RUNNING_IN_DOCKER: 1
     ports:
       - "8000:8000"
     networks:
