@@ -12,6 +12,7 @@ from .models import Users
 from pathlib import Path
 from fastapi import FastAPI
 import json
+from urllib.parse import quote_plus
 
 
 def get_db_host() -> str:
@@ -83,9 +84,9 @@ def read_database_password() -> str:
         str: The database password
     """
     if os.getenv("OCI_DATABASE_HOST"):
-        return os.getenv("OCI_DATABASE_PASSWORD")
+        return quote_plus(os.getenv("OCI_DATABASE_PASSWORD"))
     
-    return read_postgres_password()
+    return quote_plus(read_postgres_password())
 
 
 def get_database_url() -> str:
