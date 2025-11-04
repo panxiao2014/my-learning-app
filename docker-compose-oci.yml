@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    restart: "no"
+    image: my-backend:latest
+    container_name: backend.mylearningapp.local
+    environment:
+      OCI_DATABASE_HOST: ${OCI_DATABASE_HOST}
+      OCI_DATABASE_USERNAME: ${OCI_DATABASE_USERNAME}
+      OCI_DATABASE_PASSWORD: ${OCI_DATABASE_PASSWORD}
+    ports:
+    ports:
+      - "3306:3306"
+    networks:
+      - myapp-network
+
+  frontend:
+    restart: "no"
+    image: my-frontend:latest
+    container_name: frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "80:80"
+    networks:
+      - myapp-network
+
+networks:
+  myapp-network:
+    driver: bridge
+
