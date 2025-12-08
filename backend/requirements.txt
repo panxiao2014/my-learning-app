@@ -1,9 +1,11 @@
 annotated-types==0.7.0
 anyio==4.11.0
 certifi==2025.10.5
+cffi==2.0.0
 charset-normalizer==3.4.3
 click==8.3.0
 colorama==0.4.6
+cryptography==46.0.3
 fastapi==0.118.2
 greenlet==3.2.4
 h11==0.16.0
@@ -17,6 +19,7 @@ packaging==25.0
 playwright==1.55.0
 pluggy==1.6.0
 psycopg2-binary==2.9.10
+pycparser==2.23
 pydantic==2.12.0
 pydantic_core==2.41.1
 pyee==13.0.0
